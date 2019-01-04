@@ -2,57 +2,62 @@
 Proof of concept:
 
 Flux made with Rxjs similar Redux api
-It has change detection to only notify those observers that need to instead of all all the time
+It has change detection to only notify those observers that need to instead of all all the time  
+
+##
+`import { equals } from 'ramda';
 import { Subject } from 'rxjs';
-import { scan ,pluck, filter, tap} from 'rxjs/operators';
-import {equals} from 'ramda'; 
+import { filter, pluck, scan, tap } from 'rxjs/operators';
 
-function createStore(initState = {}){
-  const subject = new Subject();
-  const reducer = subject.pipe(
-    scan((acc, curr) => Object.assign({}, acc, curr), initState)
-  );
+/**
+ * State Managemnt with Rxjs
+ * @param initState
+ */
+function createObservable(initState = {}) {
+    const subject = new Subject();
+    const obs = subject.pipe(scan((acc, curr) => ({ ...acc, ...curr }), initState));
 
-  let state;
-  reducer.subscribe(s => state = s);
-  const getState = () => state;
+    let state;
+    obs.subscribe(s => (state = s));
+    const getState = () => state;
 
-  return{
-    r:reducer,
-    dispatch:subject.next.bind(subject),
-    subscribe(o){
-      return reducer.subscribe(o);
-    },
-    getState
-  }
+    return {
+        dispatch: subject.next.bind(subject),
+        getState,
+        subscribe(o) {
+            return obs.subscribe(o);
+        },
+        slice(...selector) {
+            let prev;
+            return obs.pipe(
+                pluck(...selector),
+                filter(s => !equals(prev, s)),
+                tap(s => (prev = s))
+            );
+        },
+    };
 }
-const store = createStore({names:[]});
-function subStore(...path){
-  let prev;
-  const names = store.r.pipe(
-    pluck(...path),
-    filter( s => !equals(prev,s))
-    );
-  names.subscribe(val => {
-    prev = val
-    console.log('[PLUCKED]',val)
-  })
-}
+const appState = createObservable({ names: [] });
+const healthState = createObservable({ params: { list: [] }, values: 'Good health' });
 
-// subStore('names');
-subStore('a','b','c');
+healthState.subscribe(v => console.log('[HEALTH]', v));
+healthState.dispatch({});
 
-store.dispatch({ name: 'Joe' }); 
-store.dispatch({ age: 30 });
-store.dispatch({ a:{b:{c:'nested'}} });
-store.dispatch({ a:{b:{c:'nested'},d:true} });
-store.dispatch({ ramdom: Math.random() });  
-store.dispatch({names:['ale','fabi','frani']} )  ;
-store.dispatch({ ramdom: Math.random() });  
-store.dispatch({names:['ale','fabi','frani','tony']} )  ;
-store.dispatch({ ramdom: Math.random() });   
-store.dispatch({names:[]} )  ;
-console.log(store.getState())  
+appState.slice('person').subscribe(v => console.log('[PERSON SLICED]', v));
+appState.dispatch({ person: { name: 'Ham', surname: 'Burgers' } });
+appState.dispatch({ person: { age: 30 } });
+appState.dispatch({ a: { b: { c: 'nested' } } });
+appState.dispatch({ a: { b: { c: 'nested' }, d: true } });
+appState.dispatch({ ramdom: Math.random() });
+appState.dispatch({ names: ['Homer', 'Marge'] });
+appState.dispatch({ names: ['ale', 'fabi', 'bart'] });
+appState.dispatch({ names: ['ale', 'fabi', 'bart'] });
+appState.dispatch({ names: ['ale', 'fabi'] });
+appState.dispatch({ ramdom: Math.random() });
+appState.dispatch({ ramdom: Math.random() });
+console.log(appState.getState());
 
-
-
+const names = appState.slice('names');
+names.subscribe(v => console.log('[NAMES SLICED]', v));
+names.next({ names: ['ale'] });
+`
