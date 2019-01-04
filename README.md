@@ -5,7 +5,8 @@ Flux made with Rxjs similar Redux api
 It has change detection to only notify those observers that need to instead of all all the time  
 
 ##
-`import { equals } from 'ramda';
+```
+import { equals } from 'ramda';
 import { Subject } from 'rxjs';
 import { filter, pluck, scan, tap } from 'rxjs/operators';
 
@@ -60,4 +61,4 @@ console.log(appState.getState());
 const names = appState.slice('names');
 names.subscribe(v => console.log('[NAMES SLICED]', v));
 names.next({ names: ['ale'] });
-`
+```
