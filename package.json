@@ -1,0 +1,40 @@
+{
+  "name": "flurxjs",
+  "version": "0.0.1",
+  "description": "State management alas flux with rxjs",
+  "main": "index.js",
+  "scripts": {
+    "cover": "jest ----coverage",
+    "test:watch": "jest --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alecorsino/flurxjs.git"
+  },
+  "author": "ALejandro A Corsino",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/alecorsino/flurxjs/issues"
+  },
+  "homepage": "https://github.com/alecorsino/flurxjs#readme",
+  "devDependencies": {
+    "@types/jest": "^23.3.11",
+    "@types/ramda": "^0.25.46",
+    "jest": "^23.6.0",
+    "ts-jest": "^23.10.5",
+    "typescript": "^3.2.2"
+  },
+  "dependencies": {
+    "prettier": "^1.15.3",
+    "ramda": "^0.26.1",
+    "rimraf": "^2.6.3",
+    "rollup": "^1.0.1",
+    "rollup-plugin-auto-external": "^2.0.0",
+    "rollup-plugin-commonjs": "^9.2.0",
+    "rollup-plugin-node-resolve": "^4.0.0",
+    "rollup-plugin-typescript2": "^0.18.1",
+    "rxjs": "^6.3.3",
+    "tslint-config-prettier": "^1.17.0",
+    "tslint-plugin-prettier": "^2.0.1"
+  }
+}
